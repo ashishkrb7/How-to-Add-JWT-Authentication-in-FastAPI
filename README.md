@@ -98,7 +98,7 @@ The project is structured as follows:
 
 
 - `app`: Contains the main FastAPI application, models, schemas, and utility functions.
-- `main.py`: The main entry point for the FastAPI application.
+- `schema.py`: Contains pydantic models.
 - `deps.py`: Contains the dependency function for retrieving the currently logged-in user from the access token.
 - `database.py`: Contains the functions to do basic database operation in SQLite.
 - `utils.py`: Contains utility functions for hashing passwords and generating JWT tokens.
@@ -117,7 +117,6 @@ The project is structured as follows:
    ┣ 📜README.md
    ┣ 📜requirements.txt
    ┣ 📜schemas.py
-   ┣ 📜server.py
    ┗ 📜utils.py
    ```
 

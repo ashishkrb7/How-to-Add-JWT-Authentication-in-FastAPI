@@ -4,7 +4,7 @@ FROM python:3.10-slim
 # Maintainer
 LABEL maintainer="Ashish Kumar"
 
-EXPOSE 8000
+EXPOSE 8080
 
 # Keeps Python from generating .pyc files in the container
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -25,4 +25,5 @@ COPY . /app
 RUN adduser -u 5678 --disabled-password --gecos "" appuser && chown -R appuser /app
 USER appuser
 
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0:8000"]
+# Corrected CMD instruction
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080"]

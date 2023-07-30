@@ -30,7 +30,6 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
 from pydantic import ValidationError
-from replit import db
 
 from schemas import SystemUser, TokenPayload
 from utils import ALGORITHM, JWT_SECRET_KEY
