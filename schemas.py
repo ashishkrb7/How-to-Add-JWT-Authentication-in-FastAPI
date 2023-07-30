@@ -24,7 +24,7 @@ Contact Email: ashish.krb7@gmail.com
 
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, EmailStr, Field
 
 
 class TokenSchema(BaseModel):
@@ -58,11 +58,11 @@ class UserAuth(BaseModel):
     User authentication model.
 
     Attributes:
-        email (str): User's email address.
+        email (EmailStr): User's email address.
         password (str): User's password (min length: 5, max length: 24).
     """
 
-    email: str = Field(..., description="user email")
+    email: EmailStr = Field(..., description="user email")
     password: str = Field(..., min_length=5, max_length=24, description="user password")
 
 

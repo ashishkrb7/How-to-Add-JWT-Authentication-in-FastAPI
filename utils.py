@@ -36,8 +36,10 @@ REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
 
 # JWT settings
 ALGORITHM = "HS256"
-JWT_SECRET_KEY = os.environ["JWT_SECRET_KEY"]  # should be kept secret
-JWT_REFRESH_SECRET_KEY = os.environ["JWT_REFRESH_SECRET_KEY"]  # should be kept secret
+JWT_SECRET_KEY = "ashish"  # os.environ["JWT_SECRET_KEY"]  # should be kept secret
+JWT_REFRESH_SECRET_KEY = (
+    "ashish"  # os.environ["JWT_REFRESH_SECRET_KEY"]  # should be kept secret
+)
 
 # CryptContext for password hashing
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

@@ -30,7 +30,7 @@ from jose import jwt
 from pydantic import ValidationError
 from replit import db
 
-from app.schemas import SystemUser, TokenPayload
+from schemas import SystemUser, TokenPayload
 from utils import ALGORITHM, JWT_SECRET_KEY
 
 reuseable_oauth = OAuth2PasswordBearer(tokenUrl="/login", scheme_name="JWT")

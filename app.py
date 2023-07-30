@@ -21,26 +21,37 @@ This script contains the FastAPI endpoints responsible for user authentication a
    - Description: This endpoint requires a valid JWT access token to be provided in the Authorization header. It uses the get_current_user dependency (SystemUser) to extract and validate the user's information from the token payload. If the token is valid and the user is found in the database, their details are returned in the response.
    - Response Model: UserOut (User output model containing user's email and unique identifier).
 
+4. /reset_email:
+   - Method: POST
+   - Summary: Reset user's email address.
+   - Description: This endpoint allows users to reset their email address. The user must provide their current email address, new email address, and password for authentication. If the provided email and password are correct, the endpoint updates the user's email in the database and returns the updated user data.
+   - Response Model: UserOut (User output model containing user's email and unique identifier).
+
 Developer: Ashish Kumar
 Website: https://ashishkrb7.github.io/
 Contact Email: ashish.krb7@gmail.com
 """
 
+import os
 from uuid import uuid4
 
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, Form, HTTPException, status
 from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
-from replit import db
 
-from app.schemas import SystemUser, TokenSchema, UserAuth, UserOut
+import database
 from deps import get_current_user
+from schemas import SystemUser, TokenSchema, UserAuth, UserOut
 from utils import (
     create_access_token,
     create_refresh_token,
     get_hashed_password,
     verify_password,
 )
+
+if not os.path.exists(database.DATABASE_FILE):
+    # Create the table in the database
+    database.create_table()
 
 app = FastAPI()
 
@@ -67,19 +78,22 @@ async def create_user(data: UserAuth):
     Raises:
         HTTPException: If a user with the same email already exists in the database (status code 400).
     """
-    # querying the database to check if the user already exists
-    user = db.get(data.email, None)
+    # Query the database to check if the user already exists
+    user = database.get_data(data.email)
     if user is not None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="User with this email already exists",
         )
+
+    # Insert the new user data into the database
     user = {
         "email": data.email,
         "password": get_hashed_password(data.password),
         "id": str(uuid4()),
     }
-    db[data.email] = user  # saving user data to the database
+    database.insert_data(data.email, user)
+
     return user
 
 
@@ -101,13 +115,15 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     Raises:
         HTTPException: If the provided email or password is incorrect (status code 400).
     """
-    user = db.get(form_data.username, None)
+    # Retrieve user data from the database based on the email
+    user = database.get_data(form_data.username)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Incorrect email or password",
         )
 
+    # Verify the provided password against the hashed password in the database
     hashed_pass = user["password"]
     if not verify_password(form_data.password, hashed_pass):
         raise HTTPException(
@@ -115,6 +131,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
             detail="Incorrect email or password",
         )
 
+    # Create and return the access and refresh tokens
     return {
         "access_token": create_access_token(user["email"]),
         "refresh_token": create_refresh_token(user["email"]),
@@ -137,4 +154,54 @@ async def get_me(user: SystemUser = Depends(get_current_user)):
     Raises:
         HTTPException: If the user is not found in the database (status code 404).
     """
+    return user
+
+
+@app.post(
+    "/reset_email",
+    summary="Reset user's email address",
+    response_model=UserOut,
+)
+async def reset_email(
+    email: str = Form(...),
+    new_email: str = Form(...),
+    password: str = Form(...),
+):
+    """
+    Endpoint to reset the user's email address.
+
+    Args:
+        email (str): User's current email address.
+        new_email (str): New email address to set.
+        password (str): User's password for authentication.
+
+    Returns:
+        dict: The updated user data containing new email and unique identifier (UUID).
+
+    Raises:
+        HTTPException: If the provided email or password is incorrect (status code 400).
+    """
+    # Retrieve user data from the database based on the email
+    user = database.get_data(email)
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Incorrect email or password",
+        )
+
+    # Verify the provided password against the hashed password in the database
+    hashed_pass = user["password"]
+    if not verify_password(password, hashed_pass):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Incorrect email or password",
+        )
+
+    # Delete the old row with the previous email address
+    database.delete_data(email)
+
+    # Update the user's email in the database
+    user["email"] = new_email
+    database.insert_data(new_email, user)
+
     return user
