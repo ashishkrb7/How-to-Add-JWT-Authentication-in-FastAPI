@@ -18,7 +18,9 @@ These models are designed to work seamlessly with FastAPI to provide a secure an
 For more details on the individual models, please refer to the docstrings and comments provided for each class and attribute.
 
 Developer: Ashish Kumar
+
 Website: https://ashishkrb7.github.io/
+
 Contact Email: ashish.krb7@gmail.com
 """
 
@@ -72,11 +74,11 @@ class UserOut(BaseModel):
 
     Attributes:
         id (UUID): User's unique identifier.
-        email (str): User's email address.
+        email (EmailStr): User's email address.
     """
 
     id: UUID
-    email: str
+    email: EmailStr
 
 
 class SystemUser(UserOut):

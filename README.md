@@ -83,7 +83,7 @@ Before you begin, make sure you have the following installed on your system:
 5. Run the FastAPI application using `uvicorn`:
 
    ```
-   uvicorn server:app --reload
+   uvicorn app:app --reload
    ```
 
 6. The application will start, and you can access the API documentation (Swagger UI) at `http://localhost:8000/docs` in your browser.
@@ -100,7 +100,7 @@ The project is structured as follows:
 - `app`: Contains the main FastAPI application, models, schemas, and utility functions.
 - `main.py`: The main entry point for the FastAPI application.
 - `deps.py`: Contains the dependency function for retrieving the currently logged-in user from the access token.
-- `replit.py`: Simulates a key-value database for storing user information.
+- `database.py`: Contains the functions to do basic database operation in SQLite.
 - `utils.py`: Contains utility functions for hashing passwords and generating JWT tokens.
 
 
@@ -109,6 +109,7 @@ The project is structured as follows:
    ┣ 📜.dockerignore
    ┣ 📜.gitignore
    ┣ 📜app.py
+   ┣ 📜database.py
    ┣ 📜deps.py
    ┣ 📜docker-compose.yml
    ┣ 📜Dockerfile

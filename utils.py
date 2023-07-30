@@ -19,7 +19,9 @@ Constants:
     - JWT_REFRESH_SECRET_KEY: The secret key used for encoding refresh tokens. Should be kept secret.
 
 Developer: Ashish Kumar
+
 Website: https://ashishkrb7.github.io/
+
 Contact Email: ashish.krb7@gmail.com
 """
 

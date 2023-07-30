@@ -17,7 +17,9 @@ This module contains utility functions and dependencies related to authenticatio
    - If the user is not found, an HTTPException with status code 404 (Not Found) is raised.
 
 Developer: Ashish Kumar
+
 Website: https://ashishkrb7.github.io/
+
 Contact Email: ashish.krb7@gmail.com
 """
 

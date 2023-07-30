@@ -24,11 +24,13 @@ This script contains the FastAPI endpoints responsible for user authentication a
 4. /reset_email:
    - Method: POST
    - Summary: Reset user's email address.
-   - Description: This endpoint allows users to reset their email address. The user must provide their current email address, new email address, and password for authentication. If the provided email and password are correct, the endpoint updates the user's email in the database and returns the updated user data.
-   - Response Model: UserOut (User output model containing user's email and unique identifier).
+   - Description: This endpoint allows users to reset their email address and update their password. It requires the user's current email address, new email address, current password, and new password. It verifies the provided credentials and updates the user's data in the database.
+   - Response Model: UserOut (User output model containing updated email and unique identifier).
 
 Developer: Ashish Kumar
+
 Website: https://ashishkrb7.github.io/
+
 Contact Email: ashish.krb7@gmail.com
 """
 
@@ -38,6 +40,7 @@ from uuid import uuid4
 from fastapi import Depends, FastAPI, Form, HTTPException, status
 from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordRequestForm
+from pydantic import EmailStr
 
 import database
 from deps import get_current_user
@@ -143,7 +146,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 )
 async def get_me(user: SystemUser = Depends(get_current_user)):
     """
-    Endpoint to get details of the currently logged-in user.
+    Endpoint to get details of the currently logged-in user. You will be able to see the Authorize button in the swagger docs and a 🔒 icon in front of the protected endpoint /me
 
     Args:
         user (SystemUser, optional): SystemUser instance representing the currently authenticated user.
@@ -163,9 +166,10 @@ async def get_me(user: SystemUser = Depends(get_current_user)):
     response_model=UserOut,
 )
 async def reset_email(
-    email: str = Form(...),
-    new_email: str = Form(...),
+    email: EmailStr = Form(...),
+    new_email: EmailStr = Form(...),
     password: str = Form(...),
+    new_password: str = Form(...),
 ):
     """
     Endpoint to reset the user's email address.
@@ -173,7 +177,8 @@ async def reset_email(
     Args:
         email (str): User's current email address.
         new_email (str): New email address to set.
-        password (str): User's password for authentication.
+        password (str): User's current password for authentication.
+        new_password (str): New password to set.
 
     Returns:
         dict: The updated user data containing new email and unique identifier (UUID).
@@ -200,8 +205,9 @@ async def reset_email(
     # Delete the old row with the previous email address
     database.delete_data(email)
 
-    # Update the user's email in the database
+    # Update the user's email and password in the database
     user["email"] = new_email
+    user["password"] = get_hashed_password(new_password)
     database.insert_data(new_email, user)
 
     return user

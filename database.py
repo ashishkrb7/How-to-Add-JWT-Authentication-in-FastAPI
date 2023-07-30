@@ -5,7 +5,9 @@ This script contains functions to handle interactions with an SQLite database to
 It includes functions to create a table, insert data, retrieve data, and delete data.
 
 Developer: Ashish Kumar
+
 Website: https://ashishkrb7.github.io/
+
 Contact Email: ashish.krb7@gmail.com
 """
 import json
