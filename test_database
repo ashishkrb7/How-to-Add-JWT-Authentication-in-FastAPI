@@ -1,0 +1,61 @@
+import os
+import json
+import pytest
+#from your_sqlite_script import create_table, insert_data, get_data, delete_data
+
+@pytest.fixture
+def setup_and_teardown():
+    # Setup: Ensure the database file is created before testing
+    create_table()
+    yield
+    # Teardown: Remove the database file after testing
+    os.remove("data.db")
+
+def test_create_table(setup_and_teardown):
+    # Test table creation
+    # It is already created in the setup, so this test ensures there is no error during creation
+    assert os.path.exists("data.db")
+
+def test_insert_data():
+    # Test data insertion
+    email = "test@example.com"
+    data = {"key": "value"}
+    
+    # Insert data into the database
+    insert_data(email, data)
+
+    # Retrieve the data and check if it matches the inserted data
+    retrieved_data = get_data(email)
+    assert retrieved_data == data
+
+def test_get_data_not_found():
+    # Test retrieval of data when the email is not found
+    email = "nonexistent@example.com"
+    
+    # Retrieve data for a nonexistent email
+    retrieved_data = get_data(email)
+    assert retrieved_data is None
+
+def test_delete_data():
+    # Test deletion of data
+    email = "test@example.com"
+    data = {"key": "value"}
+    
+    # Insert data into the database
+    insert_data(email, data)
+
+    # Delete the data and check if it is no longer present in the database
+    delete_data(email)
+    retrieved_data = get_data(email)
+    assert retrieved_data is None
+
+def test_delete_data_not_found():
+    # Test deletion of data for a nonexistent email
+    email = "nonexistent@example.com"
+    
+    # Attempt to delete data for a nonexistent email
+    delete_data(email)
+
+    # No error should be raised, and no data should be present in the database
+    retrieved_data = get_data(email)
+    assert retrieved_data is None

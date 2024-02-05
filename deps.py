@@ -24,7 +24,8 @@ Contact Email: ashish.krb7@gmail.com
 """
 
 from datetime import datetime
-from typing import Any, Union
+from sqlite3 import dbapi2       
+from typing import Any, Union         
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -67,7 +68,7 @@ async def get_current_user(token: str = Depends(reuseable_oauth)) -> SystemUser:
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    user: Union[dict[str, Any], None] = db.get(token_data.sub, None)
+    user: Union[dict[str, Any], None] = dbapi2.get(token_data.sub, None)
 
     if user is None:
         raise HTTPException(

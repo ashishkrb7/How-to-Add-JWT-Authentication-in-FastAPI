@@ -1,0 +1,58 @@
+import os
+from datetime import datetime, timedelta
+from utils import (
+    get_hashed_password,
+    verify_password,
+    create_access_token,
+    create_refresh_token,
+)
+
+# Constants for testing
+TEST_PASSWORD = "testpassword"
+TEST_HASHED_PASSWORD = (
+    "$2b$12$f3WBF2tf2fEGO9/SnR.ZZOsq7r8zhTBmP6mLrD.4mKlyuA7thjMBu"
+)
+TEST_SUBJECT = "testuser"
+
+def test_get_hashed_password():
+    # Test password hashing
+    hashed_password = get_hashed_password(TEST_PASSWORD)
+    assert hashed_password != TEST_PASSWORD
+    assert verify_password(TEST_PASSWORD, hashed_password)
+
+def test_verify_password():
+    # Test password verification
+    assert verify_password(TEST_PASSWORD, TEST_HASHED_PASSWORD)
+    assert not verify_password("incorrectpassword", TEST_HASHED_PASSWORD)
+
+def test_create_access_token():
+    # Test access token creation
+    expires_delta = timedelta(minutes=15)  # 15 minutes expiration for testing
+    access_token = create_access_token(TEST_SUBJECT, expires_delta=expires_delta)
+
+    # Decode the token to get the payload
+    decoded_payload = jwt.decode(access_token, os.getenv("JWT_SECRET_KEY"), algorithms=["HS256"])
+
+    # Check if the subject and expiration are correct
+    assert decoded_payload["sub"] == TEST_SUBJECT
+    assert (
+        datetime.utcfromtimestamp(decoded_payload["exp"])
+        <= datetime.utcnow() + expires_delta
+    )
+
+def test_create_refresh_token():
+    # Test refresh token creation
+    expires_delta = timedelta(days=3)  # 3 days expiration for testing
+    refresh_token = create_refresh_token(TEST_SUBJECT, expires_delta=expires_delta)
+
+    # Decode the token to get the payload
+    decoded_payload = jwt.decode(
+        refresh_token, os.getenv("JWT_REFRESH_SECRET_KEY"), algorithms=["HS256"]
+    )
+
+    # Check if the subject and expiration are correct
+    assert decoded_payload["sub"] == TEST_SUBJECT
+    assert (
+        datetime.utcfromtimestamp(decoded_payload["exp"])
+        <= datetime.utcnow() + expires_delta
+    )
